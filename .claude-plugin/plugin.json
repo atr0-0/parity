@@ -1,0 +1,21 @@
+{
+  "name": "parity",
+  "displayName": "Parity",
+  "version": "0.1.0",
+  "description": "Rebuild a website in your own project and prove it matches — machine-readable captures of both sides plus an automated, field-by-field fidelity diff.",
+  "author": {
+    "name": "Shubham Tandon",
+    "url": "https://github.com/atr0-0"
+  },
+  "license": "MIT",
+  "keywords": [
+    "fidelity",
+    "verification",
+    "regression",
+    "web",
+    "capture",
+    "design-system",
+    "migration"
+  ],
+  "hooks": "./hooks/hooks.json"
+}

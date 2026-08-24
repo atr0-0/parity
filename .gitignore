@@ -1,0 +1,11 @@
+# Per-session working copies of the extractor. A development-time workaround from
+# when the tool was edited while in use; never part of the published tool.
+.sessions/
+
+# Captures and diff output, if run from inside this repo
+*.capture.json
+ours.json
+/tmp/
+
+node_modules/
+.DS_Store
