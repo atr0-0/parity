@@ -67,57 +67,78 @@ lazily. Run `preflight.sh --project DIR` to check the environment.
 ## Workflow
 
 ```mermaid
-flowchart TB
-    subgraph EP1["Step 1 · /parity-bootstrap — once per project"]
-        direction TB
-        S0["S0 · Check state"]
-        SURVEY["S1–S6 · Study the site<br/>setup · pages · grouping<br/>blocks · tokens · scope"]
-        S7{"S7 · Grouping right?"}
-        S75{"S7.5 · Worth reusing?"}
-        S8["S8 · Write findings — draft"]
-        REV{"You approve"}
-        S0 --> SURVEY --> S7
-        S7 -->|"no — regroup"| SURVEY
-        S7 -->|"yes"| S75 --> S8 --> REV
-        REV -->|"not yet — blocked"| S8
-    end
+block-beta
+  columns 3
 
-    REV -->|"approved"| P0
+  H1["<b>Step 1 · /parity-bootstrap</b> — once per project"]:3
+  S0["<b>S0</b> · Check for existing notes"]
+  S1["<b>S1–S6</b> · Study the site<br/>setup · pages · grouping<br/>blocks · tokens · scope"]
+  S7{{"<b>S7</b> · Do the groups predict<br/>pages it never sampled?"}}
 
-    subgraph EP2["Step 2 · /parity-page — once per page"]
-        direction TB
-        P0{"P0 · Reusable layout?"}
-        P1["P1 · Measure the real page"]
-        P2["P2 · Write build notes"]
-        P3["P3 · Build structure"]
-        P4{"P4 · Does it match?"}
-        P5["P5 · Add real content"]
-        P6["P6 · Verify + record"]
-        P0 -->|"yes — start from it"| P1
-        P0 -->|"no — start from this page"| P1
-        P1 -->|"doesn't fit after all"| P0
-        P1 --> P2 --> P3 --> P4
-        P4 -->|"no — fix"| P3
-        P4 -->|"yes"| P5 --> P6
-        P6 -->|"next page"| P0
-    end
+  space:3
 
-    P6 --> SYNC["Step 3 · /parity-sync --push"]
+  REV{{"<b>You review</b> and approve<br/>nothing builds until you do"}}
+  S8["<b>S8</b> · Write the findings<br/>as draft"]
+  S75{{"<b>S7.5</b> · Enough reuse to<br/>justify a shared layout?"}}
 
-    classDef decide fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
-    classDef gate fill:#dcfce7,stroke:#15803d,color:#14532d,stroke-width:3px
-    classDef plain fill:#eef2ff,stroke:#6366f1,color:#1e1b4b
-    class S7,S75,P0 decide
-    class REV,P4 gate
-    class P1,P2,P5,P6 gate
-    class S0,SURVEY,S8,P3 plain
-    class SYNC plain
+  space:3
+
+  H2["<b>Step 2 · /parity-page</b> — once per page"]:3
+  P0{{"<b>P0</b> · Does this page have<br/>a shared layout?"}}
+  P1["<b>P1</b> · Measure the real page"]
+  P2["<b>P2</b> · Write the build notes"]
+
+  space:3
+
+  P5["<b>P5</b> · Add the real content"]
+  P4{{"<b>P4</b> · Does your build<br/>match theirs?"}}
+  P3["<b>P3</b> · Build the structure<br/>placeholders only"]
+
+  space:3
+
+  P6["<b>P6</b> · Re-verify, then record<br/>what was learned"]
+  SYNC["<b>/parity-sync --push</b><br/>share with other sessions"]
+  space
+
+  S0 --> S1
+  S1 --> S7
+  S7 --> S75
+  S75 --> S8
+  S8 --> REV
+  REV --> P0
+  P0 --> P1
+  P1 --> P2
+  P2 --> P3
+  P3 --> P4
+  P4 --> P5
+  P5 --> P6
+  P6 --> SYNC
+
+  S7 --> S1
+  REV --> S8
+  P1 --> P0
+  P4 --> P3
+
+  style H1 fill:#fef3c7,stroke:#b45309
+  style H2 fill:#fef3c7,stroke:#b45309
+  style S7 fill:#e0e7ff,stroke:#4338ca
+  style S75 fill:#e0e7ff,stroke:#4338ca
+  style P0 fill:#e0e7ff,stroke:#4338ca
+  style REV fill:#dcfce7,stroke:#15803d
+  style P4 fill:#dcfce7,stroke:#15803d
+  style P1 fill:#dcfce7,stroke:#15803d
+  style P2 fill:#dcfce7,stroke:#15803d
+  style P5 fill:#dcfce7,stroke:#15803d
+  style P6 fill:#dcfce7,stroke:#15803d
 ```
 
-**Green** = the run stops and waits for you. **Diamonds** = decisions. The arrows back
-are the parts worth knowing: a grouping that doesn't predict gets regrouped *before* any
-page is built on it, a page that turns out not to fit its layout switches at P1, and
-P3–P4 repeats until the measurements match.
+**Reading it.** Rows run left-to-right, then drop down and run back — follow the arrows.
+**Green** stops and waits for you. **Hexagons** are decisions.
+
+Four connectors are double-headed, and those are the loops that matter: **S1–S6 ↔ S7**
+regroups when the grouping fails to predict; **S8 ↔ review** stays blocked until you
+approve; **P0 ↔ P1** switches a page off a layout it turns out not to fit; **P3 ↔ P4**
+repeats until the measurements match. P0–P6 then runs again for the next page.
 
 ### Step 1 · `/parity-bootstrap` — once per project
 
