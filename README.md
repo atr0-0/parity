@@ -68,93 +68,102 @@ lazily. Run `preflight.sh --project DIR` to check the environment.
 
 ```mermaid
 flowchart TB
-    subgraph EP1["Step 1 · Study the site — /parity-bootstrap, once per project"]
+    subgraph EP1["Step 1 · /parity-bootstrap — once per project"]
         direction TB
-        S0["<b>S0 · Check what already exists</b><br/>stop if reviewed notes exist"]
-
-        subgraph SURVEY["S1–S3 · Survey"]
-            direction TB
-            S1["<b>S1 · Learn your project's setup</b><br/>stack, ports, verify command"]
-            S2["<b>S2 · List every page</b><br/>main nav, sub-navs, footer"]
-            S3["<b>S3 · Group pages that share a layout</b><br/>matched on CSS class families"]
-            S1 --> S2 --> S3
-        end
-
-        subgraph RECORD["S4–S6 · Write down the details"]
-            direction TB
-            S4["<b>S4 · Catalogue the reusable blocks</b><br/>each starts 'not built yet'"]
-            S5["<b>S5 · Collect colours, fonts, spacing</b><br/>plus each font's role"]
-            S6["<b>S6 · Ask what's out of scope</b><br/>so it's not mistaken for a bug"]
-            S4 --> S5 --> S6
-        end
-
-        S0 --> S1
-        S3 --> S4
-        S6 --> S7["<b>S7 · Test the grouping</b><br/>on pages it has never seen"]
-        S7 -->|"guessed wrong — regroup"| S3
-        S7 -->|"guessed right"| S75{"<b>S7.5 · Worth reusing?</b><br/>2+ pages AND 70%+ right"}
-        S75 --> S8["<b>S8 · Write up the findings</b><br/>draft — nothing can build yet"]
-        S8 --> REV{"<b>You approve them</b>"}
-        REV -->|"not yet — building is blocked"| S8
+        S0["S0 · Check state"]
+        SURVEY["S1–S3 · Survey<br/>setup · pages · grouping"]
+        RECORD["S4–S6 · Record details<br/>blocks · tokens · scope"]
+        S7{"S7 · Grouping right?"}
+        S75{"S7.5 · Worth reusing?"}
+        S8["S8 · Write findings — draft"]
+        REV{"You approve"}
+        S0 --> SURVEY --> RECORD --> S7
+        S7 -->|"no — regroup"| SURVEY
+        S7 -->|"yes"| S75 --> S8 --> REV
+        REV -->|"not yet — blocked"| S8
     end
 
     REV -->|"approved"| P0
 
-    subgraph EP2["Step 2 · Build a page — /parity-page, once per page"]
+    subgraph EP2["Step 2 · /parity-page — once per page"]
         direction TB
-        P0{"<b>P0 · Reusable layout?</b><br/>read from the notes"}
-        P0 -->|"yes"| TPL["<b>Start from the shared layout</b><br/>reuse what exists, flag what's new"]
-        P0 -->|"no, it's one of a kind"| PPG["<b>Start from this page alone</b><br/>all from its own measurements"]
-        TPL --> P1
-        PPG --> P1
-        P1["<b>P1 · Measure the real page</b><br/>twice, to spot live content"]
-        P1 -->|"doesn't fit the layout after all — switch"| PPG
-        P1 --> P2["<b>P2 · Write the build notes</b><br/>the differences, or the whole page"]
-        P2 --> P3["<b>P3 · Build the structure</b><br/>placeholder text, blocks tagged"]
-        P3 --> P4{"<b>P4 · Does it match?</b><br/>field by field"}
-        P4 -->|"no — fix and re-check"| P3
-        P4 -->|"yes"| P5["<b>P5 · Add the real content</b><br/>written fresh, never copied"]
-        P5 --> P6["<b>P6 · Compare again, and record</b><br/>real text wraps differently"]
+        P0{"P0 · Reusable layout?"}
+        P1["P1 · Measure the real page"]
+        P2["P2 · Write build notes"]
+        P3["P3 · Build structure"]
+        P4{"P4 · Does it match?"}
+        P5["P5 · Add real content"]
+        P6["P6 · Verify + record"]
+        P0 -->|"yes — start from it"| P1
+        P0 -->|"no — start from this page"| P1
+        P1 -->|"doesn't fit after all"| P0
+        P1 --> P2 --> P3 --> P4
+        P4 -->|"no — fix"| P3
+        P4 -->|"yes"| P5 --> P6
         P6 -->|"next page"| P0
     end
 
-    P6 --> SYNC["<b>Step 3 · Share what you learned</b><br/>/parity-sync --push"]
-    SYNC -.->|"other sessions pick it up"| P0
+    P6 --> SYNC["Step 3 · /parity-sync --push"]
 
-    classDef same fill:#dcfce7,stroke:#15803d,color:#14532d
-    classDef sameStop fill:#dcfce7,stroke:#15803d,color:#14532d,stroke-width:4px
-    classDef differsStop fill:#fae8ff,stroke:#a21caf,color:#4a044e,stroke-width:4px
-    classDef differs fill:#fae8ff,stroke:#a21caf,color:#4a044e
     classDef decide fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
-    classDef decideStop fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b,stroke-width:4px
-    classDef share fill:#f1f5f9,stroke:#64748b,color:#0f172a
-    class P3 same
-    class P1,P5,P6 sameStop
-    class P2 differsStop
-    class TPL,PPG differs
-    class S75,P0 decide
-    class REV,P4 decideStop
-    class SYNC share
+    classDef gate fill:#dcfce7,stroke:#15803d,color:#14532d,stroke-width:3px
+    classDef plain fill:#eef2ff,stroke:#6366f1,color:#1e1b4b
+    class S7,S75,P0 decide
+    class REV,P4 gate
+    class P1,P2,P5,P6 gate
+    class S0,SURVEY,RECORD,S8,P3 plain
+    class SYNC plain
 ```
 
-**Thick border** = stops for your review. **Green** = same on every page. **Purple** =
-depends on the page's layout. **Diamonds** = decisions. The inner boxes group steps that
-run together.
+**Green** = the run stops and waits for you. **Diamonds** = decisions. The arrows back
+are the parts worth knowing: a grouping that doesn't predict gets regrouped *before* any
+page is built on it, a page that turns out not to fit its layout switches at P1, and
+P3–P4 repeats until the measurements match.
+
+### Step 1 · `/parity-bootstrap` — once per project
+
+| | What happens | What you do |
+|---|---|---|
+| **S0** | Reads existing `.parity/` state. Refuses to overwrite `reviewed` work | Answer refresh-or-stop |
+| **S1** | Records the stack from your own config files — framework, styling, data-fetch pattern, dev-server URL, verify command | Answer anything it can't discover. It won't guess |
+| **S2** | Crawls the reference: nav, sub-navs, footer | — |
+| **S3** | Samples 2–3 pages per candidate group and clusters them, recording which signal it used | — |
+| **S4** | Enumerates every distinct block per layout | — |
+| **S5** | Extracts colours, type scale, spacing, and the font **role** map | — |
+| **S6** | Asks once: anything out of scope, deferred, or stubbed? | Answer — empty is fine |
+| **S7** | Tests its own clustering against pages it never sampled. Poor result → back to S3 | — |
+| **S7.5** | Per layout: 2+ pages **and** 70%+ accurate, or its pages go per-page | — |
+| **S8** | Writes every artifact as `draft`, reports, stops | **Review, then mark `reviewed`** |
+
+Nothing builds until you promote them — that gate is what stops one wrong assumption
+reaching ten pages.
+
+### Step 2 · `/parity-page <route>` — once per page
+
+| | What happens | Stops? |
+|---|---|---|
+| **P0** | Resolves the mode, declares reuse / extend / new per block | no |
+| **P1** | Captures the reference **twice** — whatever differs between two identical captures is live content, and self-populates the ignore list | **yes** |
+| **P2** | Writes the build notes: differences only, or the whole page | **yes** |
+| **P3** | Builds structure with placeholder content, tagging each block `data-parity-module` | no |
+| **P4** | Captures your page, diffs, loops until clean | **yes** |
+| **P5** | Wires real data through your project's own pattern | **yes** |
+| **P6** | Re-diffs with real content, updates the catalog, inventory and ledgers | **yes** |
+
+P3 is untagged for a reason: without `data-parity-module` the extractor finds nothing on
+your side and the diff has nothing to compare.
 
 ## Two build modes
 
-Each layout must be used by **2+ pages** and be right **70%+ of the time** on pages the
-bootstrap never sampled. Otherwise its pages build per-page. Decided per page — real sites
-mix strong layouts with one-offs.
+Decided per page, because real sites mix strong layouts with one-offs. Only P0 and P2
+differ — capture, diff and every gate are identical, which is why per-page is a real mode
+and not a degraded one.
 
 | | shared layout | per-page |
 |---|---|---|
-| P0 | Read the layout, declare REUSE / EXTEND / NEW | No layout; expectations come from the capture |
+| P0 | Read the layout, declare reuse / extend / new | No layout; expectations come from the capture |
 | P2 | Notes record only the **differences** | Notes are **self-contained** |
-| Reuse | Modules resolve REUSE/EXTEND | Modules start NEW; 2nd occurrence gets shared |
-
-Capture, diff and every gate are identical. A page that turns out not to fit its layout
-downgrades itself at P1 and records the miss.
+| Reuse | Blocks resolve reuse/extend | Blocks start new; the 2nd occurrence gets shared |
 
 ## Parallel sessions
 
