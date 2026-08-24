@@ -71,13 +71,12 @@ flowchart TB
     subgraph EP1["Step 1 · /parity-bootstrap — once per project"]
         direction TB
         S0["S0 · Check state"]
-        SURVEY["S1–S3 · Survey<br/>setup · pages · grouping"]
-        RECORD["S4–S6 · Record details<br/>blocks · tokens · scope"]
+        SURVEY["S1–S6 · Study the site<br/>setup · pages · grouping<br/>blocks · tokens · scope"]
         S7{"S7 · Grouping right?"}
         S75{"S7.5 · Worth reusing?"}
         S8["S8 · Write findings — draft"]
         REV{"You approve"}
-        S0 --> SURVEY --> RECORD --> S7
+        S0 --> SURVEY --> S7
         S7 -->|"no — regroup"| SURVEY
         S7 -->|"yes"| S75 --> S8 --> REV
         REV -->|"not yet — blocked"| S8
@@ -111,7 +110,7 @@ flowchart TB
     class S7,S75,P0 decide
     class REV,P4 gate
     class P1,P2,P5,P6 gate
-    class S0,SURVEY,RECORD,S8,P3 plain
+    class S0,SURVEY,S8,P3 plain
     class SYNC plain
 ```
 
