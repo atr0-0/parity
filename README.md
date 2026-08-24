@@ -118,26 +118,26 @@ block-beta
   P4 --> P3
   P6 --> P0
 
-  style H1 fill:#fef3c7,stroke:#d97706,color:#451a03
-  style H2 fill:#fef3c7,stroke:#d97706,color:#451a03
-  style S0 fill:#eef2ff,stroke:#6366f1,color:#1e1b4b
-  style S1 fill:#eef2ff,stroke:#6366f1,color:#1e1b4b
-  style S8 fill:#eef2ff,stroke:#6366f1,color:#1e1b4b
-  style P3 fill:#eef2ff,stroke:#6366f1,color:#1e1b4b
-  style S7 fill:#dbeafe,stroke:#2563eb,color:#172554
-  style S75 fill:#dbeafe,stroke:#2563eb,color:#172554
-  style P0 fill:#dbeafe,stroke:#2563eb,color:#172554
-  style P4 fill:#dbeafe,stroke:#2563eb,color:#172554
-  style REV fill:#dcfce7,stroke:#16a34a,color:#14532d
-  style P1 fill:#dcfce7,stroke:#16a34a,color:#14532d
-  style P2 fill:#dcfce7,stroke:#16a34a,color:#14532d
-  style P5 fill:#dcfce7,stroke:#16a34a,color:#14532d
-  style P6 fill:#dcfce7,stroke:#16a34a,color:#14532d
-  style SYNC fill:#f1f5f9,stroke:#64748b,color:#0f172a
+  style H1 stroke:#d97706,stroke-width:2px
+  style H2 stroke:#d97706,stroke-width:2px
+  style S0 stroke:#6366f1,stroke-width:2px
+  style S1 stroke:#6366f1,stroke-width:2px
+  style S8 stroke:#6366f1,stroke-width:2px
+  style P3 stroke:#6366f1,stroke-width:2px
+  style S7 stroke:#2563eb,stroke-width:2px
+  style S75 stroke:#2563eb,stroke-width:2px
+  style P0 stroke:#2563eb,stroke-width:2px
+  style P4 stroke:#2563eb,stroke-width:2px
+  style REV stroke:#16a34a,stroke-width:2px
+  style P1 stroke:#16a34a,stroke-width:2px
+  style P2 stroke:#16a34a,stroke-width:2px
+  style P5 stroke:#16a34a,stroke-width:2px
+  style P6 stroke:#16a34a,stroke-width:2px
+  style SYNC stroke:#64748b,stroke-width:2px
 ```
 
-**Reading it.** Rows run left-to-right, then drop and run back. **Green** stops and waits
-for you. **Hexagons** are decisions.
+**Reading it.** Rows run left-to-right, then drop and run back. **Hexagons** are
+decisions; **green borders** mark the phases that stop and wait for you.
 
 Five connectors run both ways, and those are the loops: **S1–S6 ↔ S7** regroups when the
 grouping fails to predict; **S8 ↔ review** stays blocked until you approve; **P0 ↔ P1**
