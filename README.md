@@ -71,32 +71,30 @@ block-beta
   columns 3
 
   H1["<b>Step 1 · /parity-bootstrap</b> — once per project"]:3
-  S0["<b>S0</b> · Check for existing notes"]
+  S0["<b>S0</b><br/>Check for existing notes"]
   S1["<b>S1–S6</b> · Study the site<br/>setup · pages · grouping<br/>blocks · tokens · scope"]
-  S7{{"<b>S7</b> · Do the groups predict<br/>pages it never sampled?"}}
+  S7{{"<b>S7</b><br/>Do the groups predict<br/>pages it never sampled?"}}
 
   space:3
 
-  REV{{"<b>You review</b> and approve<br/>nothing builds until you do"}}
-  S8["<b>S8</b> · Write the findings<br/>as draft"]
-  S75{{"<b>S7.5</b> · Enough reuse to<br/>justify a shared layout?"}}
-
-  space:3
+  REV{{"<b>You review and approve</b><br/>nothing builds until you do"}}
+  S8["<b>S8</b><br/>Write the findings as draft"]
+  S75{{"<b>S7.5</b><br/>Enough reuse to justify<br/>a shared layout?"}}
 
   H2["<b>Step 2 · /parity-page</b> — once per page"]:3
-  P0{{"<b>P0</b> · Does this page have<br/>a shared layout?"}}
-  P1["<b>P1</b> · Measure the real page"]
-  P2["<b>P2</b> · Write the build notes"]
+  P0{{"<b>P0</b><br/>Does this page have<br/>a shared layout?"}}
+  P1["<b>P1</b><br/>Measure the real page"]
+  P2["<b>P2</b><br/>Write the build notes"]
 
   space:3
 
-  P5["<b>P5</b> · Add the real content"]
-  P4{{"<b>P4</b> · Does your build<br/>match theirs?"}}
-  P3["<b>P3</b> · Build the structure<br/>placeholders only"]
+  P5["<b>P5</b><br/>Add the real content"]
+  P4{{"<b>P4</b><br/>Does your build<br/>match theirs?"}}
+  P3["<b>P3</b><br/>Build the structure<br/>placeholders only"]
 
   space:3
 
-  P6["<b>P6</b> · Re-verify, then record<br/>what was learned"]
+  P6["<b>P6</b><br/>Re-verify, then record<br/>what was learned"]
   SYNC["<b>/parity-sync --push</b><br/>share with other sessions"]
   space
 
@@ -118,27 +116,28 @@ block-beta
   REV --> S8
   P1 --> P0
   P4 --> P3
+  P6 --> P0
 
-  style H1 fill:#fef3c7,stroke:#b45309
-  style H2 fill:#fef3c7,stroke:#b45309
-  style S7 fill:#e0e7ff,stroke:#4338ca
-  style S75 fill:#e0e7ff,stroke:#4338ca
-  style P0 fill:#e0e7ff,stroke:#4338ca
-  style REV fill:#dcfce7,stroke:#15803d
-  style P4 fill:#dcfce7,stroke:#15803d
-  style P1 fill:#dcfce7,stroke:#15803d
-  style P2 fill:#dcfce7,stroke:#15803d
-  style P5 fill:#dcfce7,stroke:#15803d
-  style P6 fill:#dcfce7,stroke:#15803d
+  classDef head fill:#fef3c7,stroke:#d97706,color:#451a03
+  classDef step fill:#eef2ff,stroke:#6366f1,color:#1e1b4b
+  classDef ask  fill:#dbeafe,stroke:#2563eb,color:#172554
+  classDef stop fill:#dcfce7,stroke:#16a34a,color:#14532d
+  classDef out  fill:#f1f5f9,stroke:#64748b,color:#0f172a
+
+  class H1,H2 head
+  class S0,S1,S8,P3 step
+  class S7,S75,P0,P4 ask
+  class REV,P1,P2,P5,P6 stop
+  class SYNC out
 ```
 
-**Reading it.** Rows run left-to-right, then drop down and run back — follow the arrows.
-**Green** stops and waits for you. **Hexagons** are decisions.
+**Reading it.** Rows run left-to-right, then drop and run back. **Green** stops and waits
+for you. **Hexagons** are decisions.
 
-Four connectors are double-headed, and those are the loops that matter: **S1–S6 ↔ S7**
-regroups when the grouping fails to predict; **S8 ↔ review** stays blocked until you
-approve; **P0 ↔ P1** switches a page off a layout it turns out not to fit; **P3 ↔ P4**
-repeats until the measurements match. P0–P6 then runs again for the next page.
+Five connectors run both ways, and those are the loops: **S1–S6 ↔ S7** regroups when the
+grouping fails to predict; **S8 ↔ review** stays blocked until you approve; **P0 ↔ P1**
+switches a page off a layout it turns out not to fit; **P3 ↔ P4** repeats until the
+measurements match; and **P6 ↔ P0** starts the next page.
 
 ### Step 1 · `/parity-bootstrap` — once per project
 
