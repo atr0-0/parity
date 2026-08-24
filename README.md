@@ -118,17 +118,22 @@ block-beta
   P4 --> P3
   P6 --> P0
 
-  classDef head fill:#fef3c7,stroke:#d97706,color:#451a03
-  classDef step fill:#eef2ff,stroke:#6366f1,color:#1e1b4b
-  classDef ask  fill:#dbeafe,stroke:#2563eb,color:#172554
-  classDef stop fill:#dcfce7,stroke:#16a34a,color:#14532d
-  classDef out  fill:#f1f5f9,stroke:#64748b,color:#0f172a
-
-  class H1,H2 head
-  class S0,S1,S8,P3 step
-  class S7,S75,P0,P4 ask
-  class REV,P1,P2,P5,P6 stop
-  class SYNC out
+  style H1 fill:#fef3c7,stroke:#d97706,color:#451a03
+  style H2 fill:#fef3c7,stroke:#d97706,color:#451a03
+  style S0 fill:#eef2ff,stroke:#6366f1,color:#1e1b4b
+  style S1 fill:#eef2ff,stroke:#6366f1,color:#1e1b4b
+  style S8 fill:#eef2ff,stroke:#6366f1,color:#1e1b4b
+  style P3 fill:#eef2ff,stroke:#6366f1,color:#1e1b4b
+  style S7 fill:#dbeafe,stroke:#2563eb,color:#172554
+  style S75 fill:#dbeafe,stroke:#2563eb,color:#172554
+  style P0 fill:#dbeafe,stroke:#2563eb,color:#172554
+  style P4 fill:#dbeafe,stroke:#2563eb,color:#172554
+  style REV fill:#dcfce7,stroke:#16a34a,color:#14532d
+  style P1 fill:#dcfce7,stroke:#16a34a,color:#14532d
+  style P2 fill:#dcfce7,stroke:#16a34a,color:#14532d
+  style P5 fill:#dcfce7,stroke:#16a34a,color:#14532d
+  style P6 fill:#dcfce7,stroke:#16a34a,color:#14532d
+  style SYNC fill:#f1f5f9,stroke:#64748b,color:#0f172a
 ```
 
 **Reading it.** Rows run left-to-right, then drop and run back. **Green** stops and waits
