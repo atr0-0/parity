@@ -527,6 +527,7 @@ can all write findings without `/parity-sync` having to merge them.
 | `missed-pattern` | The extractor did not see something that is on the page |
 | `asymmetry` | A field resolves on one side but not the other, so comparing it is meaningless |
 | `false-positive` | The diff reported a defect that is not one |
+| `false-negative` | The diff passed something a human then found. A hole in the gate itself |
 | `crash` | The extractor or a driver failed outright |
 | `unmeasurable` | A real fidelity property nothing can currently capture |
 | `ergonomics` | The tool let someone do the wrong thing quietly |
@@ -539,7 +540,10 @@ sibling repeats because it accepted one node per class family" can.
 
 ### The pairing rule
 
-A `tool-gap` entry in `deviations.json` **must** be accompanied by a feedback entry.
+A `tool-gap` entry in `deviations.json` **must** be accompanied by a feedback entry, and
+so must any bug `/parity-fix` finds that the diff had passed — that is a `false-negative`,
+and it is the most valuable kind here because it is a hole in the gate rather than in one
+page.
 They do different jobs: the deviation stops the diff reporting it *today*, the feedback
 entry is what gets it fixed *later*. A suppression with no feedback entry is precisely
 how a gap becomes permanent — suppressing costs one line, and without this rule fixing

@@ -11,7 +11,7 @@ You are running **/parity-page** — entry point 2 of two.
 |---|---|
 | *(none)* | Phase gates: stop for review at each boundary below |
 | `--unattended` | Run straight through, then present once. **Only** valid in template mode, when this page's archetype has already been cloned at least once and every module resolves to `REUSE`/`EXTEND`. Never valid in per-page mode — there is no template to have been validated |
-| `--verify-only` | Skip to P4/P6 verification on an already-built page and report the diff. This is the fix-pass loop |
+| `--verify-only` | Skip to P4/P6 verification on an already-built page and report the diff. This is the fix-pass loop. For a bug someone *reported* rather than one the diff found, use `/parity-fix` — it starts from the observation instead of the route |
 | `--per-page` | Force per-page mode, ignoring the routing verdict |
 | `--template` | Force template mode. Refused if the route has no archetype — there is nothing to build against |
 

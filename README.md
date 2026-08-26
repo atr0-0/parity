@@ -53,16 +53,18 @@ lazily. Run `preflight.sh --project DIR` to check the environment.
 | `/parity-bootstrap <url>` | Once per project | `.parity/` artifact set, as `draft` |
 | `/parity-page <route>` | Once per page | `pages/<route>/`, catalog + inventory updates |
 | `/parity-sync` | When a parallel session finishes | Your session copy, or the shared notes |
+| `/parity-fix "<report>"` | A bug someone reported on a built page | The fix, plus catalog and feedback updates |
 | `/parity-improve` | Periodically | `TOOL-GAPS.md` |
 
 | Flag | On | Effect |
 |---|---|---|
-| `--verify-only` | `clone-page` | Re-measure an already-built page |
-| `--unattended` | `clone-page` | No gates. Template mode only, on an archetype already built once |
-| `--per-page` · `--template` | `clone-page` | Force a build mode instead of the measured verdict |
-| `--pull` · `--push` | `clone-sync` | Merge direction |
-| `--tag <session>` | `clone-sync` | Operate on a named session |
-| `--since` · `--write` | `clone-improve` | Filter by date · update the backlog |
+| `--verify-only` | `parity-page` | Re-measure an already-built page |
+| `--unattended` | `parity-page` | No gates. Template mode only, on an archetype already built once |
+| `--per-page` · `--template` | `parity-page` | Force a build mode instead of the measured verdict |
+| `--pull` · `--push` | `parity-sync` | Merge direction |
+| `--tag <session>` | `parity-sync` | Operate on a named session |
+| `--route <route>` | `parity-fix` | Skip locating the page when you already know it |
+| `--since` · `--write` | `parity-improve` | Filter by date · update the backlog |
 
 ## Workflow
 
@@ -172,6 +174,36 @@ and not a degraded one.
 | P2 | Notes record only the **differences** | Notes are **self-contained** |
 | Reuse | Blocks resolve reuse/extend | Blocks start new; the 2nd occurrence gets shared |
 
+## When QA finds a bug
+
+Whoever fixes it is usually in a fresh chat with none of the build context. `/parity-fix`
+takes the report in plain words and works out the rest from the project's own artifacts:
+
+```bash
+/parity-fix "the newsletter box in the sidebar on /pricing is cut off"
+```
+
+It resolves the description to a page, a block and a component, then **checks your recorded
+decisions before touching any code** — so a bug that turns out to be a deliberate choice
+gets surfaced with its reasoning instead of silently undone.
+
+Then it re-runs the diff, which sorts the report into one of three:
+
+| The diff | Means |
+|---|---|
+| already flags it | The check worked; the build ignored it |
+| is clean and the report is right | **The check has a blind spot** — logged so it gets fixed |
+| is clean and the report is wrong | The build is correct, and here is the measurement |
+
+The middle one matters most: a defect the check should have caught will let the next one
+through too, so it is recorded against the tool, not just patched on the page.
+
+Finally it names every other page using the block you changed — the shared-component fix
+that quietly breaks a page nobody re-opened is the failure this closes.
+
+It stops only twice: when the report is ambiguous or turns out to be a recorded decision,
+and at the end if re-checking the affected pages would take real time.
+
 ## Parallel sessions
 
 Several chats, one project. Each works on its own copy; merge when one finishes:
@@ -210,7 +242,7 @@ runners, `AGENTS.md`, `docs/` — is read for its rules and never modified.
 
 ```
 parity/
-├── commands/     parity-bootstrap · parity-page · clone-sync · clone-improve
+├── commands/     parity-bootstrap · parity-page · parity-fix · parity-sync · parity-improve
 ├── skills/       capture-fidelity · module-reuse · scope-ledger
 ├── extractor/    extract.js · run-local.js · diff.js · volatility.js
 │                 run-reference.md — the reference-capture protocol
