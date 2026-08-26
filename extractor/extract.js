@@ -345,7 +345,19 @@
 
       const rowTops = [...new Set(rects.map(r => Math.round(r.top)))].sort((a, b) => a - b);
       const s = getComputedStyle(el);
+      // How deep below the module root this set was found, and whether the
+      // repeated things are images or wrappers. Two captures can both report an
+      // itemGrid while having resolved at DIFFERENT levels — one side's images
+      // against the other side's columns — and comparing those is meaningless.
+      // Recording the level is what lets the diff notice and decline.
+      let depth = 0;
+      for (let n = el; n && n !== moduleEl; n = n.parentElement) depth++;
       const candidate = {
+        resolvedLevel: {
+          depth,
+          childTag: kids[0].tagName.toLowerCase(),
+          childrenAreImages: kids.every(k => k.matches('img, picture') || !!k.querySelector('img, picture')),
+        },
         count: kids.length,
         rows: rowTops.length,
         perRow: Math.round(kids.length / rowTops.length),
@@ -480,14 +492,33 @@
    * beneath — a 16:9 image alone would be ~466px tall — so the arrangement was
    * always derivable from numbers already in hand.
    */
+  /**
+   * Where the image sits relative to the text, inside a card.
+   *
+   * Returns `null` only when there is genuinely no image to arrange. When an
+   * image IS present but the measurement could not be taken, it returns
+   * `{ unmeasured: <reason> }` instead, and the caller records the field as
+   * unmeasured rather than absent.
+   *
+   * That distinction is not academic. This anchors on `h1-h6`, and a reference
+   * app whose card headlines are not headings — common, and recorded as a
+   * deviation on this project — yields no anchor, so the reference measured
+   * nothing while a clone using real headings measured a layout. The diff then
+   * reported `expected undefined, got "image-right"` as a defect on every such
+   * module. Reading that absence as evidence caused a real regression: a feed
+   * was rebuilt without thumbnails and measured 758px against the reference's
+   * 1412px before being reverted.
+   */
   function arrangementOf(el) {
     const img = el.querySelector('img, picture');
+    if (!img) return null;                       // measured: there is no image
+
     const text = el.querySelector('h1,h2,h3,h4,h5,h6');
-    if (!img || !text) return null;
+    if (!text) return { unmeasured: 'no-heading-anchor' };
 
     const i = img.getBoundingClientRect();
     const t = text.getBoundingClientRect();
-    if (i.width === 0 || t.width === 0) return null;
+    if (i.width === 0 || t.width === 0) return { unmeasured: 'zero-rect' };
 
     let layout = 'overlapping';
     if (i.right <= t.left + 6) layout = 'image-left';
@@ -1186,6 +1217,14 @@
       // same-element cell as "absent" inverts the very comparison this exists for.
       const cell = cellEl || el;
       const itemGrid = itemGridOf(el);
+
+      // Measurement state, gathered before the module is assembled. A field
+      // listed here was NOT measured; that is a different claim from measuring
+      // it and finding nothing, and the diff has to be able to tell them apart.
+      const unmeasured = [];
+      const arrangement = arrangementOf(itemGrid?._firstCard || el);
+      if (arrangement && arrangement.unmeasured) unmeasured.push('arrangement');
+
       return {
         id,
         fingerprint,
@@ -1207,10 +1246,14 @@
         // Measured inside a CARD, not across the module. Measuring the whole
         // module makes its header count as "text above the image" and reports
         // every headed module as image-below, which is never what it means.
-        arrangement: arrangementOf(itemGrid?._firstCard || el),
+        arrangement: arrangement && arrangement.unmeasured ? null : arrangement,
         itemCount: el.children.length, // DOM children; see itemGrid for real card counts
         elements: elementsOf(el, config.fontRoles),
         a11y: a11yOf(el),
+        // Field paths this capture did NOT measure, as distinct from measured
+        // and found absent. The diff skips them rather than comparing a value
+        // against a gap in its own knowledge.
+        unmeasured,
         volatile: false, // set by the driver's double-capture pass, never here
         behavior: [], // agent-observed; property extraction cannot see it
         notes: null,

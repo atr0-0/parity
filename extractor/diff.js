@@ -343,11 +343,40 @@ function diffCaptures(reference, ours, { deviations, ledger, mode = 'fidelity' }
     if (!mine) continue; // already reported at page level
 
     const isScoped = scoped.has(ref.id);
+
+    // Fields either side declared it did not measure. Comparing one side's
+    // measurement against the other side's gap in knowledge produces a finding
+    // that looks exactly like a defect and is not one — and acting on it has
+    // already caused a wrong rebuild on this project.
+    const unmeasured = new Set([...(ref.unmeasured || []), ...(mine.unmeasured || [])]);
+
+    // itemGrid can resolve at different DOM levels on the two sides — one side's
+    // images against the other's columns. Both are "measured"; they are just not
+    // measurements OF the same thing, so the comparison is void.
+    const refLevel = ref.itemGrid?.resolvedLevel;
+    const ourLevel = mine.itemGrid?.resolvedLevel;
+    const levelsDiffer = refLevel && ourLevel &&
+      (refLevel.childrenAreImages !== ourLevel.childrenAreImages || refLevel.depth !== ourLevel.depth);
+    if (levelsDiffer) unmeasured.add('itemGrid');
+
     const at = (field, a, b, tol = 0) => {
       const path = `modules.${ref.id}.${field}`;
       if (ignorePaths.has(path)) {
         report.skipped.push({ module: ref.id, path, reason: 'volatile-field' });
         return;
+      }
+      // A prefix match, so declaring `arrangement` covers `arrangement.layout`
+      // and every other field beneath it.
+      for (const u of unmeasured) {
+        if (field === u || field.startsWith(u + '.')) {
+          report.skipped.push({
+            module: ref.id, path,
+            reason: u === 'itemGrid' && levelsDiffer
+              ? `not-comparable: itemGrid resolved at different levels (reference depth ${refLevel.depth}${refLevel.childrenAreImages ? ', images' : ''} vs ours ${ourLevel.depth}${ourLevel.childrenAreImages ? ', images' : ''})`
+              : 'unmeasured',
+          });
+          return;
+        }
       }
       const why = expected.match(path, a, b);
       report.compare(path, a, b, tol, {

@@ -13,7 +13,7 @@ site's quirk.
 
 ---
 
-## 1 · The extractor cannot say "not measured"
+## 1 · The extractor cannot say "not measured" — **MOSTLY FIXED 2026-08-26**
 
 **Cluster.** Three separate symptoms, one cause, one fix.
 **Projects** 1 · **Hits** 3 · **Worst impact** a module rebuilt wrongly and reverted
@@ -33,11 +33,22 @@ reference capture said `arrangement: undefined`; it measured 758px against the r
 1412px and was reverted. The row height alone should have refuted it — but the field read
 as evidence of absence.
 
-**Fix shape:** every optional field carries an explicit measurement state, so absent and
-unmeasured are different values. Then the diff can skip unmeasured fields instead of
-comparing them, and nothing downstream has to guess. `itemGridOf` additionally needs to
-record *which* DOM level it resolved to, so two sides can be compared at the same level
-or not at all.
+**Fixed for two of the three.** Each module now carries an `unmeasured` list of field
+paths it did not measure, and the diff skips any path either side declares — a claim
+distinct from measuring and finding nothing.
+
+- `arrangementOf` returns `null` only when there is genuinely no image. When an image is
+  present but no `h1-h6` anchor exists — which is every card on a reference whose
+  headlines are not headings — it reports `unmeasured` instead.
+- `itemGridOf` records `resolvedLevel` (depth, child tag, whether the children are
+  images). The diff declines the whole `itemGrid` comparison when the two sides resolved
+  at different levels, naming both in the skip reason.
+
+**Still open: `elementsOf`.** A role whose selector does not match is simply absent from
+the output, and the extractor genuinely cannot tell "this module has no dek" from "this
+module's dek is not shaped like my selector". Closing it needs a different approach than a
+measurement flag — probably role inference from position and typography rather than a
+selector list.
 
 ---
 
