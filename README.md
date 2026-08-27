@@ -230,6 +230,7 @@ changed them.
 ├── deviations.json           deliberate departures, so the diff expects them
 ├── id-map.json               their module names ↔ yours
 ├── pages/<route>/            capture.json · ours.json · spec.md
+│   └── <fixture>/            a state worth capturing on its own — empty, error, as-admin
 ├── preflight.json            this project's own environment checks (optional)
 ├── tool-feedback.jsonl       gaps found in the tool itself (append-only)
 └── sessions/<tag>/           only when sessions run in parallel
@@ -264,6 +265,7 @@ Everything app-specific lands in the target project under `.parity/`.
 | Term | Means |
 |---|---|
 | **capture** | JSON of everything measurable about one page — sizes, fonts, colours, positions, counts |
+| **fixture** | The state a capture was taken under — empty list, as-admin, past page 1. A route with state is not one page |
 | **module** | One repeated block: a header, a story card, an ad slot |
 | **archetype** | A layout several pages share |
 | **deviation** | A difference you chose on purpose, so the check expects it |

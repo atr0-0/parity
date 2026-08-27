@@ -32,7 +32,13 @@ for our clone, so the two are directly comparable field for field.
   "target": {
     "kind": "reference",              // "reference" | "clone"
     "url": "https://example.com/docs",
-    "route": "/docs"
+    "route": "/docs",
+
+    // WHICH state of this route, and WHO was looking. The diff refuses to
+    // compare captures differing on either — see "Fixtures and actors" below.
+    // null is correct for an app whose pages do not vary by state or role.
+    "fixture": "empty-list",          // null when unspecified
+    "actor":   "reporter"             // null when unspecified
   },
 
   // Recorded so a diff can refuse to compare captures taken under
@@ -146,6 +152,39 @@ for our clone, so the two are directly comparable field for field.
   "unmatched": []
 }
 ```
+
+---
+
+## Fixtures and actors — when a route stops being a page
+
+A URL has one canonical rendering only while an app has no state. As soon as it does, the
+same route renders differently for an empty list and a full one, for an admin and a
+reporter, before and after a record exists — and the states that matter most never appear
+in a default capture at all: empty, loading, error, permission-denied, past the pagination
+threshold.
+
+A **fixture** names the precondition a capture was taken under. An **actor** names who was
+looking.
+
+```
+.parity/pages/browse-PROJ-123/
+├── default/capture.json
+├── as-reporter/capture.json
+└── no-permission/capture.json
+```
+
+The fixture is also what makes two *different datasets* comparable. You are never
+comparing their record #42 against our record #7 — you are comparing "an issue in this
+state" on both sides. On the clone that precondition is produced by seeding; on the
+reference it is found or set up.
+
+**The diff refuses to compare across a differing fixture or actor**, exactly as it refuses
+a viewport mismatch, and for the same reason: those are not two measurements of one page,
+they are measurements of two different pages. Reporting every difference between an empty
+list and a full one is worse than refusing, because each one looks exactly like a defect.
+
+Record the fixture the capture **actually observed**, not the one that was requested. A
+reference-side precondition is manual setup on someone else's instance and it decays.
 
 ---
 

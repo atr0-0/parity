@@ -264,6 +264,25 @@ function diffCaptures(reference, ours, { deviations, ledger, mode = 'fidelity' }
   if (re.deviceScaleFactor !== oe.deviceScaleFactor) {
     return { fatal: `deviceScaleFactor mismatch: ${re.deviceScaleFactor} vs ${oe.deviceScaleFactor}.` };
   }
+
+  // Same reasoning as the viewport guard, one level up: these are not two
+  // measurements of one page, they are measurements of two different pages.
+  // Reporting every difference between an empty list and a full one is worse
+  // than refusing, because each one looks exactly like a defect.
+  const rt = reference.target || {};
+  const ot = ours.target || {};
+  if ((rt.fixture || null) !== (ot.fixture || null)) {
+    return {
+      fatal: `Fixture mismatch: reference "${rt.fixture || 'unspecified'}" vs ours "${ot.fixture || 'unspecified'}". `
+           + `A capture of one state cannot be compared against a capture of another.`,
+    };
+  }
+  if ((rt.actor || null) !== (ot.actor || null)) {
+    return {
+      fatal: `Actor mismatch: reference "${rt.actor || 'unspecified'}" vs ours "${ot.actor || 'unspecified'}". `
+           + `The same route renders differently per role; capture both sides as the same actor.`,
+    };
+  }
   if (oe.settled === false) {
     report.findings.push({
       path: 'environment.settled',

@@ -1269,6 +1269,19 @@
         kind: config.kind || 'unknown',
         url: location.href,
         route: config.route || location.pathname,
+
+        // WHICH state of this route, and WHO was looking.
+        //
+        // A route stops being a page once an app has state. The same URL renders
+        // differently for an empty list and a full one, for an admin and a
+        // reporter, before and after a record exists. Two captures differing on
+        // either are measurements of two different pages, so the diff refuses —
+        // the same reasoning as the viewport guard.
+        //
+        // null means "unspecified", which is correct for an app whose pages do
+        // not vary, and keeps captures taken before this field comparable.
+        fixture: config.fixture || null,
+        actor: config.actor || null,
       },
 
       environment: {

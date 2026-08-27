@@ -80,7 +80,18 @@ Follow `${CLAUDE_PLUGIN_ROOT}/extractor/run-reference.md`.
 captures is volatile by definition — ads, live figures, timestamps, rotating content —
 and lands in `volatility.ignore` automatically. Never hand-maintain that list.
 
-Write `.parity/pages/<route>/capture.json`. Then:
+Write `.parity/pages/<route>/capture.json` — or
+`.parity/pages/<route>/<fixture>/capture.json` when the page varies by state or role.
+Pass `--fixture` and `--actor` to `run-local.js` so both sides record which state was
+measured; the diff refuses to compare captures that disagree on either. Schema and
+reasoning in `${CLAUDE_PLUGIN_ROOT}/templates/ARTIFACTS.md`.
+
+**A route is not a page once the app has state.** The empty, error and permission-denied
+renderings never show up in a default capture, and they are where a build most often
+diverges. Capture them as separate fixtures rather than assuming one capture covers the
+route.
+
+Then:
 
 - Flag every module matching a `scope-ledger` detection signal.
 - List anything in `unmatched` — those are new modules or a gap in the taxonomy.

@@ -23,6 +23,11 @@ const path = require('path');
 // check is a stronger settle signal anyway, and it's capped.
 const DEFAULTS = { viewport: '1440x900', scale: 1, runs: 1, wait: 'load', timeout: 45000 };
 
+// --fixture names the state this capture was taken under, --actor who was
+// looking. Both are recorded on the capture, and the diff refuses to compare
+// two captures that disagree on either.
+
+
 function parseArgs(argv) {
   const out = { ...DEFAULTS };
   for (let i = 2; i < argv.length; i++) {
@@ -101,6 +106,8 @@ async function capture(browser, args, config) {
   const config = {
     kind: 'clone',
     route: args.route || new URL(args.url).pathname,
+    fixture: args.fixture || null,
+    actor: args.actor || null,
     ...(args.config ? JSON.parse(fs.readFileSync(args.config, 'utf8')) : {}),
   };
 
