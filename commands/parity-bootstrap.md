@@ -38,6 +38,16 @@ Read `.parity/SYSTEM_DESIGN.md` if it exists and check its `status`:
 If `module-catalog.json` and `page-inventory.json` exist from earlier work, read them —
 on a re-run they carry evidence the first pass did not have (Step 3).
 
+**Read `.parity/scope.json` if present.** It names the routes this operator is
+accountable for. Most of the steps below change shape when it exists, because most of
+what a full bootstrap goes and measures has, on a project you joined midway, already been
+built and written down by the people who were here first.
+
+**The rule, once scope is set: derive from the CODE what the team already established;
+go to the reference only for the routes in `owns`.** That is where the time is saved —
+not by skipping rigour, but by not re-measuring a live site to learn things the repo
+already states.
+
 Also read any existing project rules (`AGENTS.md`, `CLAUDE.md`, `README.md`,
 `docs/`). You are layering on top of them, so you must know what they already
 mandate — especially anything about accessibility, performance, or data handling that
@@ -66,6 +76,11 @@ source-file heuristics.
 Using the browser, enumerate every reachable page: primary nav, every sub-nav under
 it, and the footer. For each, record URL, route, its parent, and its sub-nav children.
 
+**With a scope set, skip this.** A site-wide crawl exists to find a taxonomy across a
+whole app. On a handful of assigned routes there is no taxonomy to find, and crawling
+someone else's forty pages to build your three is exactly the waste scope exists to
+avoid. Record only the routes in `owns`, and mark the inventory `partial`.
+
 State the limit honestly in the artifact: a crawl finds **linked** pages only. Note
 anything you know exists but couldn't reach.
 
@@ -85,6 +100,10 @@ trustworthy:
 Rung 1 is evidence, not inference — prefer it whenever the app exposes it. Many apps
 don't (utility-class frameworks, or hashes that change per build); fall down the
 ladder and say so.
+
+**With a scope set, do not cluster.** Two or three routes are not a population, and an
+archetype derived from them is a claim dressed as a finding. Record the routes and their
+modules; leave archetypes empty and say why.
 
 **The clustering is the heuristic part.** Whether "category page" is its own archetype
 or a variant of "hub" is a judgment call, as is variant-vs-separate-component. Record
@@ -117,14 +136,43 @@ reader should be able to tell the difference.
 
 ## Step 4 — seed the module catalog
 
-Per archetype, enumerate the distinct modules and their variants, keyed by
-fingerprint. Every entry starts `status: not-built` with `component: null`.
+**First, derive it from the codebase — always, scope or not.** On a project with any
+history the answer to *what has this team already built?* is in the repo, not on the
+reference site, and it costs a grep rather than a browser session:
+
+- Module components declare their own id — `moduleId = "rail-carousel"` — which gives
+  module id → component path directly.
+- Page views carry `data-parity-module="..."` literals for the modules they place.
+- The id belongs to the **call site** as often as the component: a view may pass
+  `moduleId="lineup-2up-hero"` to a component whose default is `lineup-2up`. Read both,
+  and record the component either way.
+- When a generic wrapper and the component it wraps carry the same id, record the
+  **inner** one. A layout cell that takes `moduleId` as a pass-through will otherwise
+  appear as the component behind half the catalog, which is worse than no entry — it
+  points every future reuse question at the wrong file.
+
+Everything found this way starts `status: built` with a real `component` path, because it
+demonstrably exists. This is strictly better than starting empty in every case, joined
+project or not — an empty catalog is what lets duplicates accumulate, and a written reuse
+rule with nothing to consult loses to expedience every time.
+
+Then, per archetype, enumerate the distinct modules and their variants, keyed by
+fingerprint. Anything not already found in the code starts `status: not-built` with
+`component: null`.
 
 This artifact is the one that prevents accidental duplication later. A written
 reuse rule without a catalog of what exists loses to expedience every time — the
 catalog is what makes "does this already exist?" answerable in seconds.
 
 ## Step 5 — extract design tokens
+
+**Read the project's own theme first.** A styling config — a Tailwind config, a theme
+file, a stylesheet of custom properties — already holds the colours, font families,
+spacing steps and container widths the team settled on. Those are the values the build
+must actually match; re-deriving approximations by sampling the reference produces a
+second, competing set.
+
+Sample the reference only for what the theme does not answer.
 
 Colors, type scale, font stacks, spacing steps, breakpoints, border and radius
 values.
@@ -156,6 +204,15 @@ Before anyone builds on this taxonomy, measure it.
 2. Capture each one.
 3. Check whether it actually matches that archetype's template.
 4. Record `matched / total` in the archetype template and in `SYSTEM_DESIGN.md`.
+
+**With a scope set this cannot run, and must say so.** The test needs pages the
+clustering claims but never sampled; across a handful of assigned routes you have sampled
+them all, so there is nothing left to test against. Report accuracy as **unmeasurable at
+this scope**, with the reason.
+
+Do not report `3/3`. That is testing against the pages it learned from, and it is
+indistinguishable in the output from a real result. Do not report `0/0` either — that
+reads as a broken taxonomy. Absence of a measurement is not a measurement.
 
 Report the number plainly, including when it's bad. A taxonomy with a measured
 accuracy is a finding; one without is a claim.
@@ -192,11 +249,39 @@ Thresholds live in the file so a project can tune them. Change them deliberately
 so in the summary; silently loosening them to make an archetype qualify defeats the
 measurement.
 
+**With no measured accuracy, no archetype qualifies** and every route in scope builds
+per-page. For a handful of assigned routes that is the correct answer rather than a
+degraded one — three pages are not a pattern worth templating.
+
 **`per-page` is a legitimate outcome, not a failure.** It means each page is built from
 its own capture, which is the same pipeline minus the template layer — same capture, same
 diff, same gates. On a site where every page genuinely differs, that is the cheaper route
 and the template layer would be pure overhead. Do not soften a verdict to avoid reporting
 it.
+
+## Step 7.6 — neighbours (scope only)
+
+Before extending a shared component you have to know which *other* routes render it.
+That normally lives in the catalog's `occurrences`, which fills in as pages get built —
+so on a project you have just joined it is empty, and the warning is silent exactly when
+you are least familiar with the codebase. Silence here is indistinguishable from "nothing
+else uses this", which is the dangerous reading.
+
+**Derive it from the import graph instead**, and label how: route file → view →
+the module components it imports, resolving barrel re-exports. Write each neighbour with
+`derivedFrom: "imports"`.
+
+It over-reports, in three known ways: a component may be imported but rendered
+conditionally; a module's id often comes from a call-site prop rather than the
+component's default; and one route file can serve many routes behind dynamic segments,
+so expanding those needs the inventory.
+
+**Over-reporting is the right way to be wrong here.** A neighbour you did not need costs
+one check; a neighbour you missed costs someone else's page. An `occurrences` entry —
+exact, because a real capture produced it — supersedes an `imports` one for the same
+module as soon as a build produces it.
+
+Never present an `imports` list as though it were measured.
 
 ## Step 8 — emit artifacts, then gate
 
@@ -219,6 +304,15 @@ Emit a template file even for an archetype that failed Step 7.5 — the evidence
 member list stay useful — but stamped `routing.mode: "per-page"` so `/parity-page` never
 delta-specs against it. A disqualified archetype is a record, not an instruction.
 
+**With a scope set, the artifacts are honestly partial.** `SYSTEM_DESIGN.md` carries
+`scope: partial` and lists the routes it covers; `page-inventory.json` holds only those
+routes. Nobody should be able to mistake it for a full bootstrap — a partial artifact
+presented as complete is worse than no artifact, because the next session builds on it
+believing the whole app was derived.
+
+The user promotes it to `partial-reviewed` rather than `reviewed`. `/parity-page` and
+`/parity-fix` accept either, and refuse routes outside `owns`.
+
 All are written with `status: draft`. Then **present a summary and stop**:
 
 - Archetypes found, with confidence and evidence
@@ -227,6 +321,10 @@ All are written with `status: draft`. Then **present a summary and stop**:
   build will actually cost
 - Module count and page count
 - Anything you could not determine, and any rung-3/4 guesses that need a human call
+- **With a scope set:** which routes it covers, what was derived from the codebase rather
+  than the reference, what was skipped because of scope, and that accuracy is
+  unmeasurable. An operator should finish the summary knowing exactly how much of the app
+  this describes
 
 The user promotes artifacts to `status: reviewed`. Nothing downstream treats them as
 authoritative until then — `/parity-page` refuses to build against `draft`.

@@ -204,6 +204,40 @@ that quietly breaks a page nobody re-opened is the failure this closes.
 It stops only twice: when the report is ambiguous or turns out to be a recorded decision,
 and at the end if re-checking the affected pages would take real time.
 
+## Joining a project midway
+
+You are handed three routes on a rebuild that started months ago. A full bootstrap would
+go and re-measure a site your teammates already built and wrote down.
+
+Name what you own:
+
+```jsonc
+// .parity/scope.json  — local, git-ignored, never synced
+{ "schema": "parity/scope/v1", "owns": ["/board", "/backlog"] }
+```
+
+`/parity-bootstrap` then **reads the repo before it reads the reference**. The block
+catalog comes out of the components themselves, the tokens out of the theme config, the
+conventions out of the project's own docs — no browser, nothing re-derived. It visits the
+reference only for the routes you own, and writes a system design marked `partial` that
+says which routes it covers.
+
+| | routes you own | everything else |
+|---|---|---|
+| Build, edit, verify | yes | refused, and told whose it is |
+| Read for reuse | yes | **yes — the whole repo, always** |
+| Report findings | yes | not yours to act on |
+| Warn before you break it | yes | **yes** |
+
+The read/write split is the point: you have to see every component to reuse one, while
+owning only three pages. And before you extend a shared block, parity names the other
+routes that render it — derived from the import graph on day one, and replaced by the
+exact list as pages get built. It over-reports rather than under-reports, and says which
+kind it gave you.
+
+Scope is an assignment, not a property of the project, so it never merges. With no
+`scope.json`, nothing changes.
+
 ## Parallel sessions
 
 Several chats, one project. Each works on its own copy; merge when one finishes:

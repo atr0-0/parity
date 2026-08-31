@@ -31,9 +31,31 @@ You are running **/parity-page** — entry point 2 of two.
 Read `.parity/SYSTEM_DESIGN.md`, `module-catalog.json`, `scope-ledger.json`,
 `deviations.json`, `page-inventory.json`, and `tokens.json`.
 
-**Refuse to proceed if `SYSTEM_DESIGN.md` is not `status: reviewed`** — tell the user
+**Refuse to proceed if `SYSTEM_DESIGN.md` is not `reviewed` or `partial-reviewed`** — tell the user
 to run `/parity-bootstrap` or review its output first. Building on an unreviewed
 taxonomy is how a wrong assumption gets baked into ten pages.
+
+**Then check `.parity/scope.json`, if it exists.** It names the routes this operator is
+accountable for.
+
+- Route **inside `owns`** → proceed.
+- Route **outside** → **refuse**, and name it as someone else's. A partial bootstrap
+  derived only the routes in scope, so there is nothing here to build against — and
+  building a teammate's page from a session that never studied it is how two people
+  produce two answers to one question.
+- **No `scope.json`** → no scoping; behave exactly as before.
+
+Two things scope must never restrict:
+
+- **Reuse.** Read the whole repo. You have to see every component to reuse one, and a
+  scoped session that only reads its own routes will rebuild what already exists — the
+  precise failure the catalog is for.
+- **Blast-radius warnings.** If a change touches a component another route renders, say
+  so even though that route is not yours. That is the case you most need to hear about.
+
+Findings, though, **are** scoped: do not report diffs on routes outside `owns`. They are
+not this operator's to act on, and a report full of other people's findings is one nobody
+reads.
 
 ### Resolve the mode
 

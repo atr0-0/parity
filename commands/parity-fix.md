@@ -42,8 +42,30 @@ do not stop — put it in the final summary.
 Read `.parity/SYSTEM_DESIGN.md`, `module-catalog.json`, `page-inventory.json`,
 `id-map.json`, `deviations.json`, `scope-ledger.json`, `tokens.json`.
 
-**Refuse if `SYSTEM_DESIGN.md` is not `status: reviewed`** — the same gate `/parity-page`
+**Refuse if `SYSTEM_DESIGN.md` is not `reviewed` or `partial-reviewed`** — the same gate `/parity-page`
 applies, for the same reason.
+
+**Then check `.parity/scope.json`, if it exists.** It names the routes this operator is
+accountable for.
+
+- Route **inside `owns`** → proceed.
+- Route **outside** → **refuse**, and name it as someone else's. A partial bootstrap
+  derived only the routes in scope, so there is nothing here to build against — and
+  building a teammate's page from a session that never studied it is how two people
+  produce two answers to one question.
+- **No `scope.json`** → no scoping; behave exactly as before.
+
+Two things scope must never restrict:
+
+- **Reuse.** Read the whole repo. You have to see every component to reuse one, and a
+  scoped session that only reads its own routes will rebuild what already exists — the
+  precise failure the catalog is for.
+- **Blast-radius warnings.** If a change touches a component another route renders, say
+  so even though that route is not yours. That is the case you most need to hear about.
+
+Findings, though, **are** scoped: do not report diffs on routes outside `owns`. They are
+not this operator's to act on, and a report full of other people's findings is one nobody
+reads.
 
 **Say what you could not load.** A project that never ran `/parity-bootstrap` has a partial
 set: with no `module-catalog.json` there is no component map and no blast radius later.

@@ -440,7 +440,8 @@ What every page of an archetype has in common. A page spec records only its
 Human-readable HLD. The one document a new session reads instead of re-deriving the
 app. Required sections, in order:
 
-1. **Header** — `status`, `captured`, reference base URL, edition/locale scope.
+1. **Header** — `status`, `captured`, reference base URL, edition/locale scope, and
+   `scope` — `full`, or `partial` with the routes it covers (see `scope.json`).
 2. **Stack profile** — framework, styling system, blessed data-fetch pattern,
    directory conventions. Read from the project's own config files, not inferred.
 3. **Archetypes** — one entry each: id, fingerprint, confidence, cited evidence,
@@ -449,8 +450,72 @@ app. Required sections, in order:
 5. **Global chrome** — what appears on every page.
 6. **Layout grid** — widths, columns, breakpoints.
 7. **Prediction accuracy** — the predict-and-test result. A taxonomy without a
-   measured accuracy number is a claim, not a finding.
+   measured accuracy number is a claim, not a finding. At a partial scope there may
+   be nothing to measure against; say so rather than reporting a number.
 8. **Conventions** — project-specific rules established during bootstrap.
+
+`status` may be `partial-reviewed`: reviewed, and honestly covering only part of the
+app. `/parity-page` and `/parity-fix` accept it for routes inside the scope.
+
+---
+
+## `scope.json` — the routes you are accountable for
+
+Optional, and **local: git-ignored, never merged by `/parity-sync`.** Scope is an
+*assignment*, not a property of the project. Your own parallel sessions share one file; a
+teammate with a different assignment keeps their own; sync never has to adjudicate whose
+assignment is whose.
+
+```jsonc
+{
+  "schema": "parity/scope/v1",
+  "owns": ["/board", "/backlog"],
+
+  // Routes outside `owns` that render components yours depend on. Derived, not
+  // declared — and it carries how it was derived, because the two sources are not
+  // equally trustworthy. `derivedFrom` names a source, not a degree — unlike the
+  // `confidence` field on an archetype fingerprint elsewhere in this document.
+  "neighbours": [
+    { "route": "/roadmap", "module": "issue-card", "derivedFrom": "occurrences" },
+    { "route": "/reports", "module": "issue-card", "derivedFrom": "imports" }
+  ]
+}
+```
+
+**Absent this file, every command behaves exactly as it does with no scope at all.**
+
+| | Inside `owns` | Outside |
+|---|---|---|
+| Build, edit, verify | yes | **refuse**, naming the route that owns it |
+| Read for reuse | yes | **yes — always, the whole repo** |
+| Report findings | yes | no — not your page, not your finding |
+| Blast-radius warnings | yes | **yes** — you must know what you might break |
+
+The read/write asymmetry is the point: you have to see every component in the repo to
+reuse them while owning three pages. The findings row matters nearly as much — a scoped
+session reporting on pages its operator cannot act on produces noise, and noise is what
+stops a gate being read.
+
+### `derivedFrom` on a neighbour
+
+| | Means |
+|---|---|
+| `occurrences` | Exact. A real capture recorded this module on this route |
+| `imports` | Inferred from the import graph. Over-reports |
+
+`imports` over-reports on purpose, and in three known ways: a component can be imported
+but rendered conditionally; a module's id often comes from a call-site prop rather than
+the component's default; and one route file can serve many routes through dynamic
+segments.
+
+That is the right way to be wrong here. Over-reporting costs a check you did not need;
+under-reporting skips one you did, and the whole job of this list is *do not break someone
+else's page*. An `occurrences` entry supersedes an `imports` one for the same module as
+soon as a real build produces it.
+
+Never present an `imports` list as though it were measured.
+
+---
 
 ## `WORKFLOW.md`
 

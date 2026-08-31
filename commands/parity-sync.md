@@ -44,6 +44,11 @@ base silently drops one of them.
 **Refuse to push when `base/` is missing or malformed.** Say what is wrong and stop.
 Degrading to a two-way merge is exactly the data loss this command exists to prevent.
 
+**`.parity/scope.json` is never merged, in either direction.** It records *this operator's*
+assignment, not a fact about the project — pushing it would hand a teammate your routes,
+and pulling it would overwrite yours with theirs. It is git-ignored and stays local. Your
+own parallel chats on one machine share the single file and need no merge at all.
+
 ## The merge
 
 Both directions run the *same* three-way merge — `base`, `work`, `global` — and differ
