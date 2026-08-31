@@ -1,6 +1,6 @@
 ---
-description: Derive a reference web app's system design into machine-readable project docs — archetypes, module catalog, tokens, page inventory, scope ledger. Run once per project before cloning any page. Safe to re-run; gates on review before overwriting reviewed content.
-argument-hint: [reference-url]
+description: Derive a reference web app's system design into machine-readable project docs — archetypes, module catalog, tokens, page inventory, scope ledger. Run once per project before cloning any page. Pass --scope to join a project midway and work only on assigned routes. Safe to re-run; gates on review before overwriting reviewed content.
+argument-hint: [reference-url] [--scope <route>[,<route>…]]
 ---
 
 You are running **/parity-bootstrap** — entry point 1 of two.
@@ -38,9 +38,28 @@ Read `.parity/SYSTEM_DESIGN.md` if it exists and check its `status`:
 If `module-catalog.json` and `page-inventory.json` exist from earlier work, read them —
 on a re-run they carry evidence the first pass did not have (Step 3).
 
-**Read `.parity/scope.json` if present.** It names the routes this operator is
-accountable for. Most of the steps below change shape when it exists, because most of
-what a full bootstrap goes and measures has, on a project you joined midway, already been
+**`--scope /markets,/economics` writes `.parity/scope.json` for the operator** rather than
+making them hand-write it. Normalise each route to a leading slash, and:
+
+- **No file yet** → create it with those routes as `owns` and an empty `neighbours`,
+  which Step 7.6 fills in.
+- **File exists with the same `owns`** → leave it alone and proceed.
+- **File exists with different `owns`** → **stop and show both lists.** A scope file is
+  someone's record of what they are accountable for, and silently replacing it is how a
+  session starts building a page nobody assigned it. Ask which is right.
+
+**Then make sure it is ignored by git.** If the project's `.gitignore` does not already
+cover `.parity/scope.json`, add it and say so. This file must never reach a teammate:
+committing it pushes your assignment into their checkout, and the first they would know
+is their own session refusing their own routes. Writing the file automatically makes this
+worse, not better — an operator who never typed the file is exactly the one who will not
+think to ignore it.
+
+**Read `.parity/scope.json` if present** — whether `--scope` just wrote it or it was
+already there. It names the routes this operator is accountable for.
+
+Most of the steps below change shape when it exists, because most of what a full
+bootstrap goes and measures has, on a project you joined midway, already been
 built and written down by the people who were here first.
 
 **The rule, once scope is set: derive from the CODE what the team already established;

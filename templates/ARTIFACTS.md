@@ -461,7 +461,9 @@ app. `/parity-page` and `/parity-fix` accept it for routes inside the scope.
 
 ## `scope.json` — the routes you are accountable for
 
-Optional, and **local: git-ignored, never merged by `/parity-sync`.** Scope is an
+Written by `/parity-bootstrap --scope /markets,/economics`, which also adds it to the
+project's `.gitignore`. Optional, and **local: git-ignored, never merged by
+`/parity-sync`.** Scope is an
 *assignment*, not a property of the project. Your own parallel sessions share one file; a
 teammate with a different assignment keeps their own; sync never has to adjudicate whose
 assignment is whose.

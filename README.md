@@ -61,6 +61,7 @@ lazily. Run `preflight.sh --project DIR` to check the environment.
 ```bash
 /parity-bootstrap https://example.com   # once per project — studies the site, then stops
                                        # review its notes, mark them reviewed
+                                       # --scope /a,/b to work only on assigned routes
 /parity-page /pricing                   # build one page, stopping at each gate
 /parity-page /pricing --verify-only     # re-measure after a fix
 ```
@@ -230,12 +231,14 @@ and at the end if re-checking the affected pages would take real time.
 You are handed three routes on a rebuild that started months ago. A full bootstrap would
 go and re-measure a site your teammates already built and wrote down.
 
-Name what you own:
+Name what you own on the bootstrap:
 
-```jsonc
-// .parity/scope.json  — local, git-ignored, never synced
-{ "schema": "parity/scope/v1", "owns": ["/board", "/backlog"] }
 ```
+/parity-bootstrap https://example.com --scope /board,/backlog
+```
+
+That writes `.parity/scope.json` and git-ignores it — it records *your* assignment, so it
+must not reach a teammate's checkout.
 
 `/parity-bootstrap` then **reads the repo before it reads the reference**. The block
 catalog comes out of the components themselves, the tokens out of the theme config, the
