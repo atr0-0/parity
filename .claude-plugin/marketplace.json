@@ -1,0 +1,21 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "parity",
+  "description": "Parity — rebuild a website and prove your copy matches.",
+  "owner": {
+    "name": "Shubham Tandon",
+    "url": "https://github.com/atr0-0"
+  },
+  "plugins": [
+    {
+      "name": "parity",
+      "description": "Rebuild a website in your own project and prove it matches — machine-readable captures of both sides plus an automated, field-by-field fidelity diff.",
+      "author": {
+        "name": "Shubham Tandon",
+        "url": "https://github.com/atr0-0"
+      },
+      "category": "code-quality",
+      "source": "./"
+    }
+  ]
+}

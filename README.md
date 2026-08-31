@@ -27,10 +27,31 @@ Exit `0` clean · `1` mismatches · `2` cannot compare.
 
 ## Install
 
-```bash
-claude --plugin-dir /path/to/parity   # local
-/reload-plugins                         # pick up edits
+Once, for every project on the machine — from inside Claude Code:
+
 ```
+/plugin marketplace add atr0-0/parity
+/plugin install parity@parity
+```
+
+That writes it to `~/.claude/`, so every repo you open has the commands. There is nothing
+to add per project and nothing to vendor into one: the plugin resolves its own extractor
+and templates through `${CLAUDE_PLUGIN_ROOT}`, and everything project-specific lives in
+that project's `.parity/`. `/plugin update parity` pulls a new version.
+
+To share it with a team, commit the enablement to the repo's `.claude/settings.json`:
+
+```jsonc
+{
+  "extraKnownMarketplaces": {
+    "parity": { "source": { "source": "github", "repo": "atr0-0/parity" } }
+  },
+  "enabledPlugins": { "parity@parity": true }
+}
+```
+
+Working on parity itself, load it from disk instead — `claude --plugin-dir /path/to/parity`,
+then `/reload-plugins` to pick up edits.
 
 Needs `node` and `python3`. Playwright is required only for clone-side capture and loads
 lazily. Run `preflight.sh --project DIR` to check the environment.
