@@ -1,7 +1,7 @@
 {
   "name": "parity",
   "displayName": "Parity",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Rebuild a website in your own project and prove it matches — machine-readable captures of both sides plus an automated, field-by-field fidelity diff.",
   "author": {
     "name": "Shubham Tandon",
