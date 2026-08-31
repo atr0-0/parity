@@ -16,6 +16,5 @@
     "capture",
     "design-system",
     "migration"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }
