@@ -7,21 +7,35 @@ then measures both and tells you exactly where they differ.
 
 ## See it
 
+`/parity-page /ai --verify-only` re-measures an already-built page against its capture and
+prints what moved:
+
 ```
-$ node extractor/diff.js --reference capture.json --ours ours.json --map id-map.json
+fidelity: /ai
 
-fidelity: /pricing
+  rail-newsletter
+    FAIL  itemCount: expected 2, got 1  (Δ1, tol 0)
+    FAIL  elements.eyebrow: expected "present", got "MISSING"
+  lineup-3up
+    FAIL  itemGrid.card.width: expected 265.7, got 246.2  (Δ19.5, tol 1)
+  lineup-archive
+    FAIL  geometry.height: expected 1412.2, got 1836.5  (Δ424.3, tol 211.83)
+    FAIL  controls.primary.width: expected 131.3, got 129.1  (Δ2.2, tol 1)
+  …
 
-  page
-    FAIL  page.layout.columns.rail.width: expected 400, got 376  (Δ24, tol 1)
-  section-header
-    FAIL  elements.title.typography.fontSize: expected 52, got 48  (Δ4, tol 0.5)
-  plan-grid
-    FAIL  grid.columns: expected 3, got 2  (Δ1, tol 0)
-    FAIL  geometry.container: expected "content-column", got "rail"
+  expected deviations (not failures) — 60
+    ok    modules.ticker-bar.controls.count — stock-detail-pages: non-interactive
+  …
 
-  29 checks · 4 mismatches · 8 expected · 1 volatile module · 3 volatile fields
+  653 checks · 40 mismatches · 60 expected · 0 volatile modules · 0 volatile fields
 ```
+
+A count, a missing element, and geometry to a tenth of a pixel against a stated tolerance
+— every field of every module, on both sides.
+
+- **expected** — a deviation you reviewed and signed off. Reported, never failed again.
+- **volatile** — a field that differed between two captures of the *same* page, so it is
+  not evidence and is not counted against you.
 
 Exit `0` clean · `1` mismatches · `2` cannot compare.
 
